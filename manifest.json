@@ -1,1 +1,11 @@
-ECHO is on.
+{
+  "background_page": "kernel.html",
+  
+  
+  
+  "version": "1",
+
+  "name": "ext1",
+  "description": "Processes bulks of data from various sites"
+  // "icons": { ... },
+}
