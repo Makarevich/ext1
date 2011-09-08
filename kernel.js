@@ -2,7 +2,16 @@
 //localStorage.kernel_data = 'kernel data';
 
 
-chrome.browserAction.onClicked.addListener(function(tab) {
-  console.log('Poking ' + tab.id.toString());
-  chrome.tabs.sendRequest(tab.id, {poke:true});
+chrome.extension.onRequest.addListener(function(req, sender, respond){
 });
+
+function inject(name){
+    chrome.tabs.executeScript(null, {file: name.toString() + '.js'});
+}
+
+function open_view (url){
+    chrome.tabs.create({
+        url: chrome.extension.getURL(url)
+    });
+}
+
