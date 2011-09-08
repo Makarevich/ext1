@@ -1,7 +1,21 @@
 {
   "background_page": "kernel.html",
   
+  "content_scripts": [
+    {
+      "matches": ["http://ya.ru/*", "http://*.yandex.ru/*"],
+      "js": ["content-ja.js"]
+    }
+  ],
   
+  "browser_action": {
+    "default_icon": "res/icon.png",
+    "default_title": "Process data"
+  },
+
+  // "permissions": [
+  //   "tabs",
+  // ],
   
   "version": "1",
 
