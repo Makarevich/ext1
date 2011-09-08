@@ -6,6 +6,15 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 });
 
 chrome.extension.onRequest.addListener(function(req, sender, respond){
+    if(req.store_key && req.store_data){
+        var prev = localStorage[req.store_key];
+        localStorage[req.store_key] = req.store_data;
+        respond(prev);
+    }else if(req.fetch_key){
+        respond(localStorage[req.fetch_key]);
+    }else{
+        respond();
+    }
 });
 
 function inject(name){
