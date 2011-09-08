@@ -19,7 +19,11 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
 
 function inject(name){
     chrome.tabs.executeScript(null, {
-        file: name.toString() + '.js'
+        file: 'api.js'
+    }, function(){
+        chrome.tabs.executeScript(null, {
+            file: name.toString() + '.js'
+        });
     });
 }
 
