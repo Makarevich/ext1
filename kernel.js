@@ -1,10 +1,10 @@
 
-//localStorage.kernel_data = 'kernel data';
-
+/* ==== browser action ==== */
 chrome.browserAction.onClicked.addListener(function(tab) {
     console.log('You pressed browser action');
 });
 
+/* ==== local storage iface ==== */
 chrome.extension.onRequest.addListener(function(req, sender, respond){
     if(req.store_key && req.store_data){
         var prev = localStorage[req.store_key];
@@ -17,6 +17,8 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
     }
 });
 
+
+/* ==== console API ==== */
 function inject(name){
     chrome.tabs.executeScript(null, {
         file: 'api.js'

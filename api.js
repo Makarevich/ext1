@@ -64,7 +64,7 @@ var LZW = (function(){
     }
 })();
 
-/* === localStorage API === */
+/* === localStorage user API === */
 
 var storage = (function(){
     return {
