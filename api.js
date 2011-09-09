@@ -66,5 +66,28 @@ var LZW = (function(){
 
 /* === localStorage API === */
 
+var storage = (function(){
+    return {
+        store:  store,
+        fetch:  fetch
+    };
+
+    function store(key, value, onreturn){
+        chrome.extension.sendMessage({
+            store_key:      key,
+            store_value:    value
+        }, function(resp){
+            onreturn(resp);
+        });
+    }
+
+    function fetch(key, onreturn){
+        chrome.extension.sendMessage({
+            fetch_key:      key
+        }, function(resp){
+            onreturn(resp);
+        });
+    }
+})();
 
 
