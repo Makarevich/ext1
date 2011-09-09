@@ -20,13 +20,7 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
 
 /* ==== console API ==== */
 function inject(name){
-    chrome.tabs.executeScript(null, {
-        file: 'api.js'
-    }, function(){
-        chrome.tabs.executeScript(null, {
-            file: name.toString() + '.js'
-        });
-    });
+    jQuery.getScript(name.toString() + '.js');
 }
 
 function open_view (url){
