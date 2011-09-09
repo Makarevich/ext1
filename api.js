@@ -91,3 +91,7 @@ var storage = (function(){
 })();
 
 
+/* ==== docroot ==== */
+
+var docroot = document.documentElement.cloneNode(false);
+

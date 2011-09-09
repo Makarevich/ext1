@@ -17,7 +17,6 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
     }
 });
 
-
 /* ==== console API ==== */
 function inject(name){
     jQuery.getScript(name.toString() + '.js');
@@ -28,4 +27,18 @@ function open_view (url){
         url: chrome.extension.getURL(url + '.html')
     });
 }
+
+
+/* ==== ajax stuff === */
+(function(){
+    // setup default type and default error handler
+    jQuery.ajaxSetup({
+        dataType:       "text",
+        error:          ajax_error
+    });
+
+    function ajax_error(xhr, text, err){
+        console.error('ajax error: ' + text + '/' + err);
+    }
+})();
 
