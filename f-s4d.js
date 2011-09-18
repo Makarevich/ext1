@@ -94,8 +94,6 @@
         console.log('Found ' + posts.length + ' posts');
 
         posts.each(function(i, dom){
-            var post = $(dom);
-
             var o = {
                 title:      $("div.entry > h2", this).text(),
                 href:       $("div.entry > h2 > a", this).attr('href'),
