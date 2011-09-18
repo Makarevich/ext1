@@ -33,8 +33,12 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
 
 
 /* ==== console API ==== */
-function inject(name){
+function run(name, key){
     jQuery.getScript(name.toString() + '.js');
+
+    if(key){
+        data_key = key;
+    }
 }
 
 function open_view (url){

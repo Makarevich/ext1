@@ -13,6 +13,11 @@
 
     console.log('Running s4d fetcher');
 
+    function fetch_url(url, cb){
+        console.log('Requesting ' + url + ' ...');
+        jQuery.get(url).done(cb);
+    }
+
     // request tab url
     chrome.tabs.getSelected(null, function(tab){
         check_url(tab.url);
@@ -36,7 +41,7 @@
         }
 
         // request the page
-        jQuery.get(url).done(parse_first_page);
+        fetch_url(url, parse_first_page);
     }
 
     function parse_first_page(html){
@@ -45,7 +50,7 @@
         // === parse paginator text ===
         var content = $('div#content > div > div.maincontent', docroot);
 
-        console.assert(content.length != 1);
+        console.assert(content.length == 1);
 
         var page_text = content.find('div.wp-pagenavi > span.pages').text();
 
@@ -81,17 +86,13 @@
         var url = base_url;
         if(page_cur > 1) url += 'page/' + page_cur.toString();
 
-        console.log('Requesting ' + url + ' ...');
-
-        jQuery.get(url).done(parse_posts);
+        fetch_url(url, parse_posts);
     }
 
     function parse_posts(html){
         docroot.innerHTML = html;
 
         var posts = $('div#content > div > div.maincontent > div.post.clearfix', docroot);
-
-        console.log('Found ' + posts.length + ' posts');
 
         posts.each(function(i, dom){
             var o = {
@@ -110,9 +111,9 @@
     }
 
     function store_posts(){
-        console.log('Storing posts');
+        console.log('Parsed ' + posts_data.length + ' posts');
 
-        console.log(JSON.stringify(posts_data));
+        localStorage['s4d-posts-' + data_key] = LZW.encode(JSON.stringify(posts_data));
     }
 
 })();
