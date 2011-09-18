@@ -32,9 +32,9 @@
         jQuery.get(url).done(parse_first_page);
     }
 
-    function parse_first_page(page_text){
+    function parse_first_page(page_html){
         // parse the fetched html
-        docroot.innerHTML = page_text;
+        docroot.innerHTML = page_html;
 
         // === parse paginator text ===
         var content = $('div#content > div > div.maincontent', docroot);
@@ -51,7 +51,7 @@
         }
 
         initial.num = m[1];
-        initial.html = page_text;
+        initial.html = page_html;
 
         // var content = $('div#content > div > div.maincontent > div.post', docroot)
 
