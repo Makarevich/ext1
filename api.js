@@ -91,6 +91,58 @@ var storage = (function(){
 })();
 
 
+/* === keycode === */
+var keycode = (function(){
+    var chars = '23456789' +
+        'qwertyuiopasdfghjklzxcvbnm' +
+        'QWERTYUIOPASDFGHJKLZXCVBNM' +
+        '';
+
+    return {
+        enkey: enkey,
+        dekey: dekey
+    };
+
+    function enkey(n){
+        n++;
+
+        var res = [];
+
+        var base = chars.length;
+
+        while(n > 0){
+            i = n % base;
+            res.unshift(chars[i]);
+            n = (n - i) / base;
+        }
+
+        return res.join('');
+    }
+
+    function dekey(s){
+        var n = 0;
+
+        var base = chars.length;
+
+        s = s.split('');
+
+        for(var c in s){
+            var i = chars.indexOf(s[c]);
+
+            if(i < 0){
+                throw "dekey error";
+            }
+
+            n = n * base + i;
+        }
+
+        return n - 1;
+    }
+
+})();
+
+
+
 /* ==== docroot ==== */
 
 var docroot = document.documentElement.cloneNode(false);
