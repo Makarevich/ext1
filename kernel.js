@@ -17,17 +17,6 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
     }
 });
 
-/* ==== console API ==== */
-function inject(name){
-    jQuery.getScript(name.toString() + '.js');
-}
-
-function open_view (url){
-    chrome.tabs.create({
-        url: chrome.extension.getURL(url + '.html')
-    });
-}
-
 
 /* ==== ajax stuff === */
 (function(){
@@ -42,3 +31,14 @@ function open_view (url){
     }
 })();
 
+
+/* ==== console API ==== */
+function inject(name){
+    jQuery.getScript(name.toString() + '.js');
+}
+
+function open_view (url){
+    chrome.tabs.create({
+        url: chrome.extension.getURL(url + '.html')
+    });
+}

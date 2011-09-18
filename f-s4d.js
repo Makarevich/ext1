@@ -2,7 +2,13 @@
 (function () {
 
     var base_url;           // base fetching url
-    var initial = {};       // initial page info
+
+    var init_num;
+    var init_html;
+
+    var page_cur;
+    var page_total;
+
 
     console.log('Running s4d fetcher');
 
@@ -32,9 +38,8 @@
         jQuery.get(url).done(parse_first_page);
     }
 
-    function parse_first_page(page_html){
-        // parse the fetched html
-        docroot.innerHTML = page_html;
+    function parse_first_page(html){
+        docroot.innerHTML = html;
 
         // === parse paginator text ===
         var content = $('div#content > div > div.maincontent', docroot);
@@ -50,11 +55,38 @@
             return;
         }
 
-        initial.num = m[1];
-        initial.html = page_html;
+        init_num  = m[1];
+        init_html = html;
 
-        // var content = $('div#content > div > div.maincontent > div.post', docroot)
+        page_cur   = 1;
+        page_total = m[2];
 
+        request_next_page();
+    }
+
+    function request_next_page(){
+        if(page_cur > page_total){
+            store_posts();
+        }
+
+        if(page_cur == init.num){
+            parse_posts(init.html);
+            return;
+        }
+
+        var url = base_url;
+        if(i > 1) url += '/pages/' + i.toString();
+
+        jQuery.get(url).done(parse_posts);
+    }
+
+    function parse_posts(html){
+        docroot.innerHTML = html;
+
+        // ....
+
+        page_cur++;
+        request_next_page();
     }
 
 })();
