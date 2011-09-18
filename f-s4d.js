@@ -9,6 +9,7 @@
     var page_cur;
     var page_total;
 
+    var posts_data = [];
 
     console.log('Running s4d fetcher');
 
@@ -61,21 +62,26 @@
         page_cur   = 1;
         page_total = m[2];
 
+        console.log('Current page: ' + page_cur + '/' + page_total);
+
         request_next_page();
     }
 
     function request_next_page(){
-        if(page_cur > page_total){
+        if(page_cur > 1){               // FIXME
             store_posts();
+            return;
         }
 
-        if(page_cur == init.num){
-            parse_posts(init.html);
+        if(page_cur == init_num){
+            parse_posts(init_html);
             return;
         }
 
         var url = base_url;
-        if(i > 1) url += '/pages/' + i.toString();
+        if(page_cur > 1) url += 'page/' + page_cur.toString();
+
+        console.log('Requesting ' + url + ' ...');
 
         jQuery.get(url).done(parse_posts);
     }
@@ -83,10 +89,32 @@
     function parse_posts(html){
         docroot.innerHTML = html;
 
-        // ....
+        var posts = $('div#content > div > div.maincontent > div.post.clearfix', docroot);
 
+        console.log('Found ' + posts.length + ' posts');
+
+        posts.each(function(i, dom){
+            var post = $(dom);
+
+            var o = {
+                title:      $("div.entry > h2", this).text(),
+                href:       $("div.entry > h2 > a", this).attr('href'),
+                owner:      $("div.entry > div:eq(0)", this).text(),
+                other:      $("div.entry > div:eq(1)", this).text()
+            };
+
+            posts_data.push(o);
+        });
+
+        // iterate
         page_cur++;
         request_next_page();
+    }
+
+    function store_posts(){
+        console.log('Storing posts');
+
+        console.log(JSON.stringify(posts_data));
     }
 
 })();
