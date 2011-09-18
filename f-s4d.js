@@ -113,7 +113,7 @@
     function store_posts(){
         console.log('Parsed ' + posts_data.length + ' posts');
 
-        localStorage['s4d-posts-' + data_key] = LZW.encode(JSON.stringify(posts_data));
+        localStorage[data_key1] = LZW.encode(JSON.stringify(posts_data));
     }
 
 })();
