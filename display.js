@@ -7,15 +7,17 @@ chrome.extension.sendRequest('ready', function(o){
     /* printing display hash */
     $('body').append('<h1>' + o.key + ' (' + sha1(o.data)  + ')' + '</h1>')
 
-    $('div#patterns > div').each(function(){
-        if(o.key.indexOf(this.id) == 0){
-            $(this).removeAttr('id');
+    var pat = $('div#patterns > div').hasClass(o.key);
 
-            gen_elements($(this), JSON.parse(LZW.decode(o.data)));
+    if (pat.size() == 0){
+        $('body').append('<i>No pattern found</i>');
+        return;
+    }else if (pat.size() > 1){
+        $('body').append('<i>Multiple patterns found</i>');
+        return;
+    }
 
-            return false;
-        }
-    });
+    gen_elements(pat, JSON.parse(LZW.decode(o.data)));
 
     function gen_elements(pat, data){
         var nodes = [];

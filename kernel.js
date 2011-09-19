@@ -39,7 +39,7 @@ function run(name, key1, key2){
     jQuery.getScript(name.toString() + '.js');
 }
 
-function display(key){
+function display(key, pattern){
     var current_tab;
 
     chrome.extension.onRequest.addListener(listen);
@@ -60,7 +60,7 @@ function display(key){
         }
 
         respond({
-            key:    key,
+            key:    pattern,
             data:   localStorage[key]
         });
     }
