@@ -1,4 +1,9 @@
 
+
+/*
+ * This page represents general pattern of so called "summary fetchers".
+ */
+
 (function () {
 
     var base_url;           // base fetching url
@@ -13,13 +18,13 @@
 
     console.log('Running s4d fetcher');
 
+    // start the process
+    check_url(data_key1);
+
     function fetch_url(url, cb){
         console.log('Requesting ' + url + ' ...');
         jQuery.get(url).done(cb);
     }
-
-    // request tab url
-    check_url(data_key1);
 
     function check_url(url){
         var checker = /^http:\/\/www.scholars4dev.com\//;
@@ -31,7 +36,7 @@
         }
 
         // obtain "base url"
-        var m = url.match(/^(.*\/)page\/\d+.$/);
+        var m = url.match(/^(.*\/)page\/\d+.$/);            // NOTE: here url MAY match to url of some page (though now it is discouraged)
         if(m){
             base_url = m[1];
         }else{
