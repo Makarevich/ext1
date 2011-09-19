@@ -19,9 +19,7 @@
     }
 
     // request tab url
-    chrome.tabs.getSelected(null, function(tab){
-        check_url(tab.url);
-    });
+    check_url(data_key1);
 
     function check_url(url){
         var checker = /^http:\/\/www.scholars4dev.com\//;
@@ -113,7 +111,7 @@
     function store_posts(){
         console.log('Parsed ' + posts_data.length + ' posts');
 
-        localStorage[data_key1] = LZW.encode(JSON.stringify(posts_data));
+        localStorage[data_key2] = LZW.encode(JSON.stringify(posts_data));
     }
 
 })();
