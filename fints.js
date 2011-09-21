@@ -19,7 +19,7 @@
     }
 
     function check_url(url){
-        var checker = /^http:\/\/www.intscholarships.com\//;
+        var checker = /^http:\/\/www\.intscholarships\.com\//;
 
         // check url
         if(!checker.test(url)){

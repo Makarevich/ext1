@@ -27,7 +27,7 @@
     }
 
     function check_url(url){
-        var checker = /^http:\/\/www.scholars4dev.com\//;
+        var checker = /^http:\/\/www\.scholars4dev\.com\//;
 
         // check url
         if(!checker.test(url)){
