@@ -59,6 +59,8 @@
         page_cur   = 1;
         page_total = m[1];
 
+        console.log('Page ' + page_cur + '/' + page_total);
+
         parse_posts(html);
     }
 
@@ -79,11 +81,11 @@
 
         var posts = $('div#inner-content > div.node', docroot);
 
-        posts_data.concat(
+        [].push.apply(posts_data,
             posts.map(function(i, dom){
                 return {
-                    title:      $("h2.class > a", this).text(),
-                    href:       $("h2.class > a", this).attr('href'),       // TODO: put full links
+                    title:      'http://www.intscholarships.com' + $("h2.title > a", this).text(),
+                    href:       $("h2.title > a", this).attr('href'),       // TODO: put full links
                     text:       $("div.content > p", this).text()
                 };
             }).get()
