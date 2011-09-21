@@ -37,6 +37,8 @@
 
         base_url = url;
 
+        base_url.replace('&start=0', '');
+
         // request the page
         fetch_url(url, parse_paginator);
     }
@@ -89,7 +91,7 @@
 
         console.log('Page ' + page_cur + '/' + page_total + '(len: ' + query_length + ')');
 
-        // parse_posts(html);
+        parse_posts(html);
     }
 
     function request_next_page(){
@@ -99,7 +101,7 @@
         }
 
         var url = base_url;
-        if(page_cur > 1) url += '?page=' + page_cur.toString();
+        if(page_cur > 1) url += '?start=' + ((page_cur - 1) * query_length).toString();
 
         fetch_url(url, parse_posts);
     }
@@ -107,14 +109,20 @@
     function parse_posts(html){
         docroot.innerHTML = html;
 
-        var posts = $('div#inner-content > div.node', docroot);
+        var posts = $('div.spResults > ol.ResultsList > li.ResultItem', docroot);
 
         [].push.apply(posts_data,
             posts.map(function(i, dom){
+                var tds = $("div.ResultItemContent > table.ScholarshipExtraInfo " + 
+                    "tr > td:last-child", this);
+
                 return {
-                    title:      'http://www.intscholarships.com' + $("h2.title > a", this).text(),
-                    href:       $("h2.title > a", this).attr('href'),       // TODO: put full links
-                    text:       $("div.content > p", this).text()
+                    href:       'http://www.scholarshipportal.eu/' + $("h2 > a", this).attr('href'),
+                    title:      $("h2 > a", this).text(),
+                    text:       $("div.ResultItemContent > p.Description", this).text(),
+                    levels:     tds.eq(0).text(),
+                    duration:   tds.eq(1).text(),
+                    amount:     tds.eq(2).text()
                 };
             }).get()
         );
