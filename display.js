@@ -5,14 +5,12 @@ chrome.extension.sendRequest('ready', function(o){
     console.assert(o.data != null);
 
     /* printing display hash */
-    $('body').append('<h1>' + o.key + ' (' + sha1(o.data)  + ')' + '</h1>')
+    $('body').append('<h1>' + o.key + ' ' + o.pat + ' (' + sha1(o.data)  + ')' + '</h1>')
 
     // var pat = $('div#patterns > div').hasClass(o.key);
     var pat = $('div#patterns > div').filter(function(){
-        return $(this).hasClass(o.key);
+        return $(this).hasClass(o.pat);
     });
-
-    console.log(pat);
 
     if (pat.size() == 0){
         $('body').append('<i>No pattern found</i>');

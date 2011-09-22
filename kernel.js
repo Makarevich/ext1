@@ -60,7 +60,8 @@ function display(key, pattern){
         }
 
         respond({
-            key:    pattern,
+            key:    key,
+            pat:    pattern,
             data:   localStorage[key]
         });
     }
