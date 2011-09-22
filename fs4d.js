@@ -57,18 +57,25 @@
 
         var page_text = content.find('div.wp-pagenavi > span.pages').text();
 
-        var m = page_text.match(/Page (\d+) of (\d+)/);
+        if(!page_text){
+            // there is only a single page
 
-        if(!m){
-            console.error("Cannot parse paginator text \"" + page_text + "\"");
-            return;
+            init_num = page_cur = page_total = 1;
+            init_html = html;
+        }else{
+            var m = page_text.match(/Page (\d+) of (\d+)/);
+
+            if(!m){
+                console.error("Cannot parse paginator text \"" + page_text + "\"");
+                return;
+            }
+
+            init_num  = m[1];
+            init_html = html;
+
+            page_cur   = 1;
+            page_total = m[2];
         }
-
-        init_num  = m[1];
-        init_html = html;
-
-        page_cur   = 1;
-        page_total = m[2];
 
         console.log('Current page: ' + page_cur + '/' + page_total);
 
