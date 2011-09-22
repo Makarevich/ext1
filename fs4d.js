@@ -53,7 +53,7 @@
         // === parse paginator text ===
         var content = $('div#content > div > div.maincontent', docroot);
 
-        console.assert(content.length == 1);
+        console.assert(content.length == 1, 'content.length != 1');
 
         var page_text = content.find('div.wp-pagenavi > span.pages').text();
 
@@ -76,7 +76,7 @@
     }
 
     function request_next_page(){
-        if(page_cur > 1){               // FIXME
+        if(page_cur > page_total){
             store_posts();
             return;
         }
