@@ -65,3 +65,16 @@ function display(key, pattern){
         });
     }
 }
+
+function ls (pat){
+    var ret = [];
+
+    for(var i in localStorage){
+        if(typeof pat == 'string' && i.indexOf(pat) != 0){
+            continue;
+        }
+        ret.push(i);
+    }
+
+    return ret;
+}

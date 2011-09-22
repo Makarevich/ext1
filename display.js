@@ -7,7 +7,12 @@ chrome.extension.sendRequest('ready', function(o){
     /* printing display hash */
     $('body').append('<h1>' + o.key + ' (' + sha1(o.data)  + ')' + '</h1>')
 
-    var pat = $('div#patterns > div').hasClass(o.key);
+    // var pat = $('div#patterns > div').hasClass(o.key);
+    var pat = $('div#patterns > div').filter(function(){
+        return $(this).hasClass(o.key);
+    });
+
+    console.log(pat);
 
     if (pat.size() == 0){
         $('body').append('<i>No pattern found</i>');
