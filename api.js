@@ -163,4 +163,20 @@ var keycode = (function(){
 var docroot = document.documentElement.cloneNode(false);
 
 
+/* ==== glob ==== */
+
+function glob(pat){
+    return new RegExp(pat.replace(/[\^\$\+\?\=\!\:\|\/\(\)\[\]\{\}\\\.\*]/g,
+        function (ch){
+            switch(ch){
+            case '?':
+                return '.';
+            case '*':
+                return '.*';
+            default:
+                return '\\' + ch;
+            }
+        }));
+}
+
 
