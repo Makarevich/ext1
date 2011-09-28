@@ -32,10 +32,7 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
 
 
 /* ==== console API ==== */
-function run(name, key1, key2){
-    if(key1) data_key1 = key1;
-    if(key2) data_key2 = key2;
-
+function run(name){
     jQuery.getScript(name.toString() + '.js');
 }
 
@@ -80,25 +77,18 @@ function ls (pat){
     return ret;
 }
 
-function fetch_posts(key1, key2){
-    if(key1) data_key1 = key1;
-    if(key2) data_key2 = key2;
+function fetch_posts(url, target_key){
 
-    ///
-
-    var api = m.get_posts_api();
+    var api = m.get_fetcher_api();
 
     var base_url;           // base fetching url
-
-    var page_cur;
-    var page_total;
-
+    var page_nums = null;
     var posts_data = [];
 
     console.log('Running ' + api.name + ' fetcher');
 
     // start the process
-    check_url(data_key1);
+    check_url(url);
 
     function fetch_url(url, cb){
         console.log('Requesting ' + url + ' ...');
@@ -120,46 +110,34 @@ function fetch_posts(key1, key2){
             return;
         }
 
-        base_url = url
+        base_url = url;
 
         // request the page
         fetch_url(url, parse_first_page);
     }
 
-    /*
     function parse_first_page(html){
         docroot.innerHTML = html;
 
-        // === parse paginator text ===
-        var content = $('div#inner-content > div.item-list > ul.pager > li.pager-last > a', docroot);
+        page_nums = api.parse_paginator(docroot);
 
-        console.assert(content.length == 1);
-
-        var href = content.attr('href');
-
-        var m = href.match(/\?page=(\d+)/);
-
-        if(!m){
-            console.error("Cannot parse paginator href \"" + href + "\"");
+        if(page_nums === false){
+            console.error("Cannot parse paginator");
             return;
         }
 
-        page_cur   = 1;
-        page_total = m[1];
-
-        console.log('Page ' + page_cur + '/' + page_total);
+        console.log('Page ' + page_nums[0] + '/' + page_nums[1]);
 
         parse_posts(html);
     }
 
     function request_next_page(){
-        if(page_cur > 2){               // FIXME
+        if(page_nums[0] > 2){               // FIXME
             store_posts();
             return;
         }
 
-        var url = base_url;
-        if(page_cur > 1) url += '?page=' + page_cur.toString();
+        var url = api.get_page_url(base_url, page_nums[0]);
 
         fetch_url(url, parse_posts);
     }
@@ -167,31 +145,20 @@ function fetch_posts(key1, key2){
     function parse_posts(html){
         docroot.innerHTML = html;
 
-        var posts = $('div#inner-content > div.node', docroot);
-
-        [].push.apply(posts_data,
-            posts.map(function(i, dom){
-                return {
-                    title:      'http://www.intscholarships.com' + $("h2.title > a", this).text(),
-                    href:       $("h2.title > a", this).attr('href'),       // TODO: put full links
-                    text:       $("div.content > p", this).text()
-                };
-            }).get()
-        );
+        var new_posts = api.parse_posts(docroot);
 
         console.log(posts_data);
 
+        [].push.apply(posts_data, new_posts);
+
         // iterate
-        page_cur++;
+        page_nums[0]++;
         request_next_page();
     }
 
     function store_posts(){
         console.log('Parsed ' + posts_data.length + ' posts');
 
-        localStorage[data_key2] = LZW.encode(JSON.stringify(posts_data));
+        localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
     }
-
-    */
-
 }

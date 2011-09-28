@@ -1,107 +1,52 @@
 
-(function () {
+var m = (function () {
 
-    var base_url;           // base fetching url
 
-    var page_cur;
-    var page_total;
+    return {
+        get_fetcher_api:    function(){
+            return {
+                get_url_patterns: function(){
+                    return {
+                        checker:    /^http:\/\/www\.intscholarships\.com\//,
+                        pages:      /\?page=\d+/
+                    };
+                },
 
-    var posts_data = [];
+                parse_paginator: function(docroot){
+                    // === parse paginator text ===
+                    var content = $('div#inner-content > div.item-list > ul.pager > li.pager-last > a', docroot);
 
-    console.log('Running ints fetcher');
+                    console.assert(content.length == 1);
 
-    // start the process
-    check_url(data_key1);
+                    var m = content.attr('href').match(/\?page=(\d+)/);
 
-    function fetch_url(url, cb){
-        console.log('Requesting ' + url + ' ...');
-        jQuery.get(url).done(cb);
-    }
+                    if(!m){
+                        console.log(href);
+                        return false;
+                    }
 
-    function check_url(url){
-        var checker = /^http:\/\/www\.intscholarships\.com\//;
+                    return [1, m[1]];
+                },
 
-        // check url
-        if(!checker.test(url)){
-            console.error("URL \"" + url + "\" doesnot match /" + checker.source + "/");
-            return;
+                get_page_url: function(base_url, cur){
+                    console.log(base_url);
+                    return base_url + ((cur > 1) ? ('?page=' + cur.toString()) : '');
+                },
+
+                parse_posts: function(docroot){
+                    return $('div#inner-content > div.node', docroot).map(function(i, dom){
+                        return {
+                            href:       'http://www.intscholarships.com' + $("h2.title > a", this).attr('href'),
+                            title:      $("h2.title > a", this).text(),
+                            text:       $("div.content > p", this).text()
+                        };
+                    }).get();
+                },
+
+                name:   'ints'
+            };
+
         }
-
-        // 
-        if(/\?page=\d+/.test(url)){
-            console.error("Page urls are dissallowed");
-            return;
-        }
-
-        base_url = url
-
-        // request the page
-        fetch_url(url, parse_first_page);
-    }
-
-    function parse_first_page(html){
-        docroot.innerHTML = html;
-
-        // === parse paginator text ===
-        var content = $('div#inner-content > div.item-list > ul.pager > li.pager-last > a', docroot);
-
-        console.assert(content.length == 1);
-
-        var href = content.attr('href');
-
-        var m = href.match(/\?page=(\d+)/);
-
-        if(!m){
-            console.error("Cannot parse paginator href \"" + href + "\"");
-            return;
-        }
-
-        page_cur   = 1;
-        page_total = m[1];
-
-        console.log('Page ' + page_cur + '/' + page_total);
-
-        parse_posts(html);
-    }
-
-    function request_next_page(){
-        if(page_cur > 2){               // FIXME
-            store_posts();
-            return;
-        }
-
-        var url = base_url;
-        if(page_cur > 1) url += '?page=' + page_cur.toString();
-
-        fetch_url(url, parse_posts);
-    }
-
-    function parse_posts(html){
-        docroot.innerHTML = html;
-
-        var posts = $('div#inner-content > div.node', docroot);
-
-        [].push.apply(posts_data,
-            posts.map(function(i, dom){
-                return {
-                    title:      'http://www.intscholarships.com' + $("h2.title > a", this).text(),
-                    href:       $("h2.title > a", this).attr('href'),       // TODO: put full links
-                    text:       $("div.content > p", this).text()
-                };
-            }).get()
-        );
-
-        console.log(posts_data);
-
-        // iterate
-        page_cur++;
-        request_next_page();
-    }
-
-    function store_posts(){
-        console.log('Parsed ' + posts_data.length + ' posts');
-
-        localStorage[data_key2] = LZW.encode(JSON.stringify(posts_data));
     }
 
 })();
