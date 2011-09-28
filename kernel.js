@@ -110,7 +110,9 @@ function fetch_posts(url, target_key){
             return;
         }
 
-        base_url = url;
+        base_url = (api.base_url_filter) ?
+            api.base_url_filter(url) : 
+            url;
 
         // request the page
         fetch_url(url, parse_first_page);
@@ -147,7 +149,7 @@ function fetch_posts(url, target_key){
 
         var new_posts = api.parse_posts(docroot);
 
-        console.log(posts_data);
+        console.log(new_posts);
 
         [].push.apply(posts_data, new_posts);
 
