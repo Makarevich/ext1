@@ -70,6 +70,10 @@ var m = (function () {
                         var tds = $("div.ResultItemContent > table.ScholarshipExtraInfo " + 
                             "tr > td:last-child", this);
 
+                        if( $(this).hasClass("InlineBanner") ){
+                            return null;
+                        }
+
                         return {
                             href:       'http://www.scholarshipportal.eu/' + $("h2 > a", this).attr('href'),
                             title:      $("h2 > a", this).text(),
