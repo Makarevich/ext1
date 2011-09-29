@@ -85,7 +85,7 @@ function fetch_posts(url, target_key){
 
     var base_url;           // base fetching url
     var page_nums = null;
-    var posts_data = [];
+    var posts_data = {};
 
     console.log('Running ' + api.name + ' fetcher');
 
@@ -153,17 +153,43 @@ function fetch_posts(url, target_key){
 
         console.log(new_posts);
 
-        [].push.apply(posts_data, new_posts);
+        if(new_posts.length > 0){
+            //
+            // if the posts data is empty, initialize field arrays
+            // with a first item of new_posts
+            //
+            if(is_object_empty(posts_data)){
+                var item = new_posts.shift();
+
+                posts_data = {};
+                for(var i in item){
+                    posts_data[i] = [item[i]];
+                }
+            }
+
+            for(var p in new_posts){
+                for(var i in posts_data){
+                    posts_data[i].push(p[i]);
+                }
+            }
+        }
 
         // iterate
         page_nums[0]++;
         request_next_page();
+
+        function is_object_empty(o){
+            for(var i in o) return false;
+            return true;
+        }
     }
 
     function store_posts(){
         console.log('Parsed ' + posts_data.length + ' posts');
 
-        localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
+        if(posts_data.length > 0){
+            localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
+        }
     }
 }
 
