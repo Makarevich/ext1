@@ -18,6 +18,13 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 })();
 
 
+function assert(cond, msg){
+    console.assert(cond, msg);
+    if(!cond){
+        throw 'Exiting';
+    }
+}
+
 /* ==== console API ==== */
 function run(name){
     jQuery.getScript(name.toString() + '.js');
@@ -174,12 +181,10 @@ function fetch_posts(url, target_key){
 function join_posts(keys, target_key){
     
     if(typeof keys == 'string'){
-        var pat = glob(keys);
-        // console.log('Globbed pattern: ' + pat.source);
+        // if the key is a string, treat it as a glob pattern
+        // and build the proper key list
 
-        //
-        // build a list of matched keys
-        //
+        var pat = glob(keys);
 
         keys = [];
 
@@ -192,48 +197,40 @@ function join_posts(keys, target_key){
         console.log('Matched keys: ' + keys.join(', '));
     }
 
-    console.assert(typeof keys == 'object', '"keys" is not array');
+    assert(typeof keys == 'object' && keys.length && keys.length > 0,
+        'No keys selected');
 
-    console.assert(keys.length > 0, 'No enough keys to perform the merge');
+    // initialize the collection with the first data element
 
-    //
-    // obtain the list of fields (of the first data item)
-    //
+    var coll = JSON.parse(LZW.decode( localStorage[ keys.shift() ] ));
 
-    var fields = (function(data){
-        var fs = {}
+    // join the other data to the collection
 
-        for(var f in data){
-            fs[f] = true;
+    for(var i in keys){
+        var key = keys[i];
+
+        var data = JSON.parse(LZW.decode( localStorage[key] ));
+
+        // make sure the data element contains no extraneous fields
+
+        for(var f in data) {
+            assert (coll[f],
+                'Data item ' + key +
+                ' contains an extraneous field: ' + f);
         }
 
-        return fs;
-    })( JSON.parse(LZW.decode(localStorage[keys[0]])) );
+        for(var f in coll) {
+            assert (data[f], 'Data item ' + key + ' lacks field: ' + f);
 
-    //
-    // join the data
-    //
+            // append the data field
 
-    for(var key in keys){
-        var data = JSON.parse(LZW.decode(localStorage[key]));
-
-        // verify keys
-
-        var fail = (function(){
-            for(var f in fields) if(!data[f]) return true;
-            for(var f in data) if(!fields[f]) return true;
-        })();
-
-        if(fail){
-            throw ('Fields in data item ' + key +
-                ' do not match initial key pattern');
+            [].push.apply(coll[f], data[f]);
         }
-
     }
+
+    console.log('Collected data: ', coll);
+
+    // store the collection
+    localStorage[target_key] = LZW.encode(JSON.stringify( coll ));
 }
 
-function test(){
-    console.error('1');
-    throw 12123123;
-    throw '3';
-}
