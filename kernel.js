@@ -4,19 +4,6 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     console.log('You pressed browser action');
 });
 
-/* ==== local storage iface ==== */
-/*
-chrome.extension.onRequest.addListener(function(req, sender, respond){
-    if(req.store_key && req.store_data){
-        var prev = localStorage[req.store_key];
-        localStorage[req.store_key] = req.store_data;
-        respond(prev);
-    }else if(req.fetch_key){
-        respond(localStorage[req.fetch_key]);
-    }
-});
-*/
-
 /* ==== ajax initialization === */
 (function(){
     // setup default type and default error handler
@@ -63,21 +50,6 @@ function display(key, pattern){
         });
     }
 }
-
-/*
-function ls (pat){
-    var ret = [];
-
-    for(var i in localStorage){
-        if(typeof pat == 'string' && i.indexOf(pat) != 0){
-            continue;
-        }
-        ret.push(i);
-    }
-
-    return ret;
-}
-*/
 
 function fetch_posts(url, target_key){
 
