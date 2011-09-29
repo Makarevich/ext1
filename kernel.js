@@ -64,6 +64,7 @@ function display(key, pattern){
     }
 }
 
+/*
 function ls (pat){
     var ret = [];
 
@@ -76,6 +77,7 @@ function ls (pat){
 
     return ret;
 }
+*/
 
 function fetch_posts(url, target_key){
 
@@ -163,4 +165,60 @@ function fetch_posts(url, target_key){
 
         localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
     }
+}
+
+function join_posts(keys, target_key){
+    
+    if(typeof keys == 'string'){
+        var pat = glob(keys);
+        // console.log('Globbed pattern: ' + pat.source);
+
+        //
+        // build a list of matched keys
+        //
+
+        keys = [];
+
+        for(var k in localStorage){
+            if(pat.test(k)){
+                keys.push(k);
+            }
+        }
+
+        console.log('Matched keys: ' + keys.join(', '));
+    }
+
+    console.assert(typeof keys == 'object', '"keys" is not array');
+
+    //
+    // obtain the list of fields (of the first data item)
+    //
+
+
+    var fields = [];
+
+    for(;;) {
+        console.assert(keys.length > 0, 'No enough keys to determine the data fields');
+
+        var first = keys.shift();
+
+        var data = JSON.parse( LZW.decode( localStorage[first] ));
+
+        if(data.length <= 0){
+            continue;
+        }
+
+        for(var f in data[0]){
+            fields.push(f);
+        }
+
+        if(fields.length <= 0){
+            continue;
+        }
+
+        keys.unshift(first);
+
+        break;
+    }
+    
 }
