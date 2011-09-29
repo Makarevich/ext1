@@ -123,14 +123,14 @@ function fetch_posts(url, target_key){
 
         var new_posts = api.parse_posts(docroot);
 
-        console.log(new_posts);
+        // console.log(new_posts);
 
         if(new_posts.length > 0){
-            //
-            // if the posts data is empty, initialize field arrays
-            // with a first item of new_posts
-            //
             if(is_object_empty(posts_data)){
+                //
+                // if the posts data is empty, initialize field arrays
+                // with a first item of new_posts
+                //
                 var item = new_posts.shift();
 
                 posts_data = {};
@@ -141,7 +141,7 @@ function fetch_posts(url, target_key){
 
             for(var p in new_posts){
                 for(var i in posts_data){
-                    posts_data[i].push(p[i]);
+                    posts_data[i].push(new_posts[p][i]);
                 }
             }
         }
@@ -157,9 +157,15 @@ function fetch_posts(url, target_key){
     }
 
     function store_posts(){
-        console.log('Parsed ' + posts_data.length + ' posts');
+        function data_count(o){
+            for(var i in o) return o[i].length;
+        }
 
-        if(posts_data.length > 0){
+        var count = data_count(posts_data);
+
+        console.log('Parsed ' + count + ' posts: ', posts_data);
+
+        if(count > 0){
             localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
         }
     }
@@ -188,35 +194,46 @@ function join_posts(keys, target_key){
 
     console.assert(typeof keys == 'object', '"keys" is not array');
 
+    console.assert(keys.length > 0, 'No enough keys to perform the merge');
+
     //
     // obtain the list of fields (of the first data item)
     //
 
+    var fields = (function(data){
+        var fs = {}
 
-    var fields = [];
-
-    for(;;) {
-        console.assert(keys.length > 0, 'No enough keys to determine the data fields');
-
-        var first = keys.shift();
-
-        var data = JSON.parse( LZW.decode( localStorage[first] ));
-
-        if(data.length <= 0){
-            continue;
+        for(var f in data){
+            fs[f] = true;
         }
 
-        for(var f in data[0]){
-            fields.push(f);
+        return fs;
+    })( JSON.parse(LZW.decode(localStorage[keys[0]])) );
+
+    //
+    // join the data
+    //
+
+    for(var key in keys){
+        var data = JSON.parse(LZW.decode(localStorage[key]));
+
+        // verify keys
+
+        var fail = (function(){
+            for(var f in fields) if(!data[f]) return true;
+            for(var f in data) if(!fields[f]) return true;
+        })();
+
+        if(fail){
+            throw ('Fields in data item ' + key +
+                ' do not match initial key pattern');
         }
 
-        if(fields.length <= 0){
-            continue;
-        }
-
-        keys.unshift(first);
-
-        break;
     }
-    
+}
+
+function test(){
+    console.error('1');
+    throw 12123123;
+    throw '3';
 }
