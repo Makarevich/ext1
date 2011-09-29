@@ -166,7 +166,7 @@ var docroot = document.documentElement.cloneNode(false);
 /* ==== glob ==== */
 
 function glob(pat){
-    return new RegExp(pat.replace(/[\^\$\+\?\=\!\:\|\/\(\)\[\]\{\}\\\.\*]/g,
+    return new RegExp('^' + pat.replace(/[\^\$\+\?\=\!\:\|\/\(\)\[\]\{\}\\\.\*]/g,
         function (ch){
             switch(ch){
             case '?':
@@ -176,7 +176,7 @@ function glob(pat){
             default:
                 return '\\' + ch;
             }
-        }));
+        }) + '$');
 }
 
 
