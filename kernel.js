@@ -58,6 +58,95 @@ function display(key, pattern){
     }
 }
 
+function join_posts(keys, target_key){
+    
+    if(typeof keys == 'string'){
+        // if the key is a string, treat it as a glob pattern
+        // and build the proper key list
+
+        var pat = glob(keys);
+
+        keys = [];
+
+        for(var k in localStorage){
+            if(pat.test(k)){
+                keys.push(k);
+            }
+        }
+
+        console.log('Matched keys: ' + keys.join(', '));
+    }
+
+    assert(typeof keys == 'object' && keys.length && keys.length > 0,
+        'No keys selected');
+
+    // initialize the collection with the first data element
+    var coll = JSON.parse(LZW.decode( localStorage[ keys.shift() ] ));
+
+    // make sure 'href' field is present in the data
+    assert( coll.href, "Initial data does not have a 'href' field" );
+
+    // define a bit of counters
+    var count_uni = 0;
+    var count_total = 0;
+
+    // initialize the uniqueness map
+    var uni = {};
+    for(var i in coll.href){
+        uni[ coll.href[i] ] = true;
+
+        ++count_uni;
+        ++count_total;
+    }
+
+    // join the other data to the collection
+    for(var i in keys){
+        var key = keys[i];
+
+        // fetch another batch of data
+        var data = JSON.parse(LZW.decode( localStorage[key] ));
+
+        // make sure the data element contains no extraneous fields
+        // (with respect to already collected data)
+        for(var f in data) {
+            assert (coll[f],
+                'Data item ' + key +
+                ' contains an extraneous field: ' + f);
+        }
+
+        // make sure the new batch contains all the necessary fields
+        for(var f in coll) {
+            assert (data[f], 'Data item ' + key + ' lacks field: ' + f);
+        }
+
+        // merge data itemwise
+        for(var j in data.href){
+            ++count_total;
+
+            // skip data with duplicate hrefs
+            if(uni[ data.href[j] ]){
+                continue;
+            }
+
+            ++count_uni;
+
+            // append the item fields to the collection
+            for(var f in coll) {
+                coll[f].push(data[f][j]);
+            }
+        }
+    }
+
+    console.log('Filtered out ' + count_uni + ' out of ' + count_total + ' posts');
+
+    console.log('Collected data: ', coll);
+
+    // store the collection
+    localStorage[target_key] = LZW.encode(JSON.stringify( coll ));
+}
+
+/*** fetching api ***/
+
 function fetch_posts(url, target_key){
 
     var api = m.get_fetcher_api();
@@ -115,7 +204,7 @@ function fetch_posts(url, target_key){
     }
 
     function request_next_page(){
-        if(page_nums[0] > 2){               // FIXME
+        if(page_nums[0] > page_nums[1]){
             store_posts();
             return;
         }
@@ -176,61 +265,5 @@ function fetch_posts(url, target_key){
             localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
         }
     }
-}
-
-function join_posts(keys, target_key){
-    
-    if(typeof keys == 'string'){
-        // if the key is a string, treat it as a glob pattern
-        // and build the proper key list
-
-        var pat = glob(keys);
-
-        keys = [];
-
-        for(var k in localStorage){
-            if(pat.test(k)){
-                keys.push(k);
-            }
-        }
-
-        console.log('Matched keys: ' + keys.join(', '));
-    }
-
-    assert(typeof keys == 'object' && keys.length && keys.length > 0,
-        'No keys selected');
-
-    // initialize the collection with the first data element
-
-    var coll = JSON.parse(LZW.decode( localStorage[ keys.shift() ] ));
-
-    // join the other data to the collection
-
-    for(var i in keys){
-        var key = keys[i];
-
-        var data = JSON.parse(LZW.decode( localStorage[key] ));
-
-        // make sure the data element contains no extraneous fields
-
-        for(var f in data) {
-            assert (coll[f],
-                'Data item ' + key +
-                ' contains an extraneous field: ' + f);
-        }
-
-        for(var f in coll) {
-            assert (data[f], 'Data item ' + key + ' lacks field: ' + f);
-
-            // append the data field
-
-            [].push.apply(coll[f], data[f]);
-        }
-    }
-
-    console.log('Collected data: ', coll);
-
-    // store the collection
-    localStorage[target_key] = LZW.encode(JSON.stringify( coll ));
 }
 
