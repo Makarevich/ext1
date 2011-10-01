@@ -25,6 +25,8 @@ var LZW = (function(){
         decode: lzw_decode
     };
 
+    var code_base = 0x10000;
+
     // LZW-compress a string
     function lzw_encode(s) {
         var dict = {};
@@ -32,7 +34,7 @@ var LZW = (function(){
         var out = [];
         var currChar;
         var phrase = data[0];
-        var code = 256;
+        var code = code_base;
         for (var i=1; i<data.length; i++) {
             currChar=data[i];
             if (dict[phrase + currChar] != null) {
@@ -59,11 +61,11 @@ var LZW = (function(){
         var currChar = data[0];
         var oldPhrase = currChar;
         var out = [currChar];
-        var code = 256;
+        var code = code_base;
         var phrase;
         for (var i=1; i<data.length; i++) {
             var currCode = data[i].charCodeAt(0);
-            if (currCode < 256) {
+            if (currCode < code_base) {
                 phrase = data[i];
             }
             else {
