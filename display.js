@@ -27,19 +27,29 @@ chrome.extension.sendRequest('ready', function(o){
 
         var body = $('body');
 
+        var counter_node = $(document.createElement('h2')).appendTo(body);
+
         // find template node
         nodes['key'] = pat.find('.key');
-        for(var i in data[0]){
+        for(var i in data){
             nodes[i] = pat.find('.' + i);
         }
 
         // process data
-        for(var i in data){
+        var count = 0;
+        for(var i in data[any_key(data)]){
             nodes['key'].text(keycode.enkey(i));
-            for(var j in data[i]){
-                nodes[j].text(data[i][j]);      // TODO: specify various types of content
+            for(var j in data){
+                nodes[j].text(data[j][i]);      // TODO: specify various types of content
             }
             pat.clone().appendTo(body);
+            ++count;
+        }
+
+        counter_node.text(count.toString() + ' posts');
+
+        function any_key(o){
+            for(var k in o) return k;
         }
     }
 });
