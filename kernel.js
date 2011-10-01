@@ -25,41 +25,7 @@ function assert(cond, msg){
     }
 }
 
-/* ==== console API ==== */
-function run(name){
-    jQuery.getScript(name.toString() + '.js');
-}
-
-function display(key, pattern){
-    var current_tab;
-
-    chrome.extension.onRequest.addListener(listen);
-
-    chrome.tabs.create({
-        url: chrome.extension.getURL('display.html')
-    }, function(tab){
-        current_tab = tab;
-    });
-
-    function listen(req, sender, respond){
-        if(req != 'ready'){
-            return;
-        }
-
-        if(sender.tab.id != current_tab.id){
-            return;
-        }
-
-        respond({
-            key:    key,
-            pat:    pattern,
-            data:   localStorage[key]
-        });
-    }
-}
-
-function join_posts(keys, target_key){
-    
+function glob_storage_keys(keys){
     if(typeof keys == 'string'){
         // if the key is a string, treat it as a glob pattern
         // and build the proper key list
@@ -76,6 +42,57 @@ function join_posts(keys, target_key){
 
         console.log('Matched keys: ' + keys.join(', '));
     }
+
+    return keys;
+}
+
+/* ==== console API ==== */
+function run(name){
+    jQuery.getScript(name.toString() + '.js');
+}
+
+function display(keys, pattern){
+    keys = glob_storage_keys(keys);
+
+    assert(typeof keys == 'object' && keys.length && keys.length > 0,
+        'No keys selected');
+
+    var ids = {};
+
+    for(var i in keys){
+        chrome.extension.onRequest.addListener(listen);
+
+        chrome.tabs.create({
+            url: chrome.extension.getURL('display.html')
+        }, function(tab){
+            ids[ tab.id ] = true;
+        });
+    }
+
+    function listen(req, sender, respond){
+        if(req != 'ready'){
+            return;
+        }
+
+        if(! ids[ sender.tab.id ]){
+            return;
+        }
+        delete ids[ sender.tab.id ];
+
+        chrome.extension.onRequest.removeListener(listen);
+
+        var key = keys.shift();
+
+        respond({
+            key:    key,
+            pat:    pattern,
+            data:   localStorage[key]
+        });
+    }
+}
+
+function join_posts(keys, target_key){
+    keys = glob_storage_keys(keys);
 
     assert(typeof keys == 'object' && keys.length && keys.length > 0,
         'No keys selected');
