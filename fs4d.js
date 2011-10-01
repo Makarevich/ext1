@@ -46,7 +46,8 @@ var m = (function () {
                             title:      $("div.entry > h2", this).text(),
                             href:       $("div.entry > h2 > a", this).attr('href'),
                             owner:      $("div.entry > div:eq(0)", this).text(),
-                            other:      $("div.entry > div:eq(1)", this).text()
+                            other:      $("div.entry > div:eq(1)", this).text(),
+                            date:       $("div.postdate > div.left", this).text()
                         };
                     }).get();
                 },
