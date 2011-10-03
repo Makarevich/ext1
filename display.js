@@ -20,7 +20,7 @@ chrome.extension.sendRequest('ready', function(o){
         return;
     }
 
-    gen_elements(pat, JSON.parse(LZW.decode(o.data)));
+    gen_elements(pat, LZW.decompress(o.data));
 
     function gen_elements(pat, data){
         var nodes = [];

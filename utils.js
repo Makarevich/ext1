@@ -21,8 +21,23 @@ var sha1 = (function(){
 /* === LZW API === */
 var LZW = (function(){
     return {
-        encode: lzw_encode,
-        decode: lzw_decode
+        compress:   function (data){
+            return data;
+        },
+
+        decompress: function (data){
+            return data;
+        }
+
+        /*
+        compress:   function (data){
+            return lzw_encode(JSON.stringify(data));
+        },
+
+        decompress: function (data){
+            return JSON.parse(lzw_decode(data));
+        }
+        */
     };
 
     var code_base = 0x10000;

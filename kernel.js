@@ -98,7 +98,7 @@ function join_posts(keys, target_key){
         'No keys selected');
 
     // initialize the collection with the first data element
-    var coll = JSON.parse(LZW.decode( localStorage[ keys.shift() ] ));
+    var coll = LZW.decompress( localStorage[ keys.shift() ] );
 
     // make sure 'href' field is present in the data
     assert( coll.href, "Initial data does not have a 'href' field" );
@@ -121,7 +121,7 @@ function join_posts(keys, target_key){
         var key = keys[i];
 
         // fetch another batch of data
-        var data = JSON.parse(LZW.decode( localStorage[key] ));
+        var data = LZW.decompress( localStorage[key] );
 
         // make sure the data element contains no extraneous fields
         // (with respect to already collected data)
@@ -159,7 +159,7 @@ function join_posts(keys, target_key){
     console.log('Collected data: ', coll);
 
     // store the collection
-    localStorage[target_key] = LZW.encode(JSON.stringify( coll ));
+    localStorage[target_key] = LZW.compress( coll );
 }
 
 /*** fetching api ***/
@@ -279,7 +279,7 @@ function fetch_posts(url, target_key){
         console.log('Parsed ' + count + ' posts: ', posts_data);
 
         if(count > 0){
-            localStorage[target_key] = LZW.encode(JSON.stringify(posts_data));
+            localStorage[target_key] = LZW.compress(posts_data);
         }
     }
 }
