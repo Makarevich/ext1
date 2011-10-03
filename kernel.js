@@ -186,7 +186,7 @@ function fetch_posts(urls){
         urls = [ urls, arguments[1] ];
     }
 
-    console.log('Url:', urls);
+    // console.log('Url:', urls);
 
     ///
 

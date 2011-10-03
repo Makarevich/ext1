@@ -22,11 +22,11 @@ var sha1 = (function(){
 var LZW = (function(){
     return {
         compress:   function (data){
-            return data;
+            return JSON.stringify(data);
         },
 
         decompress: function (data){
-            return data;
+            return JSON.parse(data);
         }
 
         /*
@@ -40,7 +40,7 @@ var LZW = (function(){
         */
     };
 
-    var code_base = 0x10000;
+    var code_base = 0x100;        // FIXME: the following compression is unreliable for multibyte strings
 
     // LZW-compress a string
     function lzw_encode(s) {
