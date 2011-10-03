@@ -164,122 +164,159 @@ function join_posts(keys, target_key){
 
 /*** fetching api ***/
 
-function fetch_posts(url, target_key){
+function fetch_posts(urls){
+    //
+    // First, we transform various kings of args
+    // into the uniform structure: array of url-key tuples.
+    //
+
+    if(typeof urls == 'object'){
+        //
+        // the case when 'url' is an associative array in the form of { url => key }
+        //
+
+        var u = [];
+
+        for(var i in urls){
+            u.push(i, urls[i]);
+        }
+
+        urls = u;
+    }else{
+        urls = [ urls, arguments[1] ];
+    }
+
+    console.log('Url:', urls);
+
+    ///
 
     var api = m.get_fetcher_api();
 
-    var base_url;           // base fetching url
-    var page_nums = null;
-    var posts_data = {};
-
     console.log('Running ' + api.name + ' fetcher');
 
-    // start the process
-    check_url(url);
+    process_url();
 
-    function fetch_url(url, cb){
-        console.log('Requesting ' + url + ' ...');
-        jQuery.get(url).done(cb);
-    }
-
-    function check_url(url){
-        var patterns = api.get_url_patterns();
-
-        // check url
-        if(!patterns['checker'].test(url)){
-            console.error("URL \"" + url + "\" doesnot match /" + checker.source + "/");
+    function process_url(){
+        if(urls.length <= 0){
             return;
         }
 
-        // 
-        if(patterns['pages'].test(url)){
-            console.error("Page urls are dissallowed");
-            return;
+        var url         = urls.shift();
+        var target_key  = urls.shift();
+
+        var base_url;           // base fetching url
+        var page_nums = null;
+        var posts_data = {};
+
+        // start the process
+        check_url(url);
+
+        function fetch_url(url, cb){
+            console.log('Requesting ' + url + ' ...');
+            jQuery.get(url).done(cb);
         }
 
-        base_url = (api.base_url_filter) ?
-            api.base_url_filter(url) : 
-            url;
+        function check_url(url){
+            var patterns = api.get_url_patterns();
 
-        // request the page
-        fetch_url(url, parse_first_page);
-    }
+            // check url
+            if(!patterns['checker'].test(url)){
+                console.error("URL \"" + url + "\" doesnot match /" + checker.source + "/");
+                return;
+            }
 
-    function parse_first_page(html){
-        docroot.innerHTML = html;
+            // 
+            if(patterns['pages'].test(url)){
+                console.error("Page urls are dissallowed");
+                return;
+            }
 
-        page_nums = api.parse_paginator(docroot);
+            base_url = (api.base_url_filter) ?
+                api.base_url_filter(url) : 
+                url;
 
-        if(page_nums === false){
-            console.error("Cannot parse paginator");
-            return;
+            // request the page
+            fetch_url(url, parse_first_page);
         }
 
-        console.log('Page ' + page_nums[0] + '/' + page_nums[1]);
+        function parse_first_page(html){
+            docroot.innerHTML = html;
 
-        parse_posts(html);
-    }
+            page_nums = api.parse_paginator(docroot);
 
-    function request_next_page(){
-        if(page_nums[0] > page_nums[1]){
-            store_posts();
-            return;
+            if(page_nums === false){
+                console.error("Cannot parse paginator");
+                return;
+            }
+
+            console.log('Page ' + page_nums[0] + '/' + page_nums[1]);
+
+            parse_posts(html);
         }
 
-        var url = api.get_page_url(base_url, page_nums[0]);
+        function request_next_page(){
+            if(page_nums[0] > page_nums[1]){
+                store_posts();
+                return;
+            }
 
-        fetch_url(url, parse_posts);
-    }
+            var url = api.get_page_url(base_url, page_nums[0]);
 
-    function parse_posts(html){
-        docroot.innerHTML = html;
+            fetch_url(url, parse_posts);
+        }
 
-        var new_posts = api.parse_posts(docroot);
+        function parse_posts(html){
+            docroot.innerHTML = html;
 
-        // console.log(new_posts);
+            var new_posts = api.parse_posts(docroot);
 
-        if(new_posts.length > 0){
-            if(is_object_empty(posts_data)){
-                //
-                // if the posts data is empty, initialize field arrays
-                // with a first item of new_posts
-                //
-                var item = new_posts.shift();
+            // console.log(new_posts);
 
-                posts_data = {};
-                for(var i in item){
-                    posts_data[i] = [item[i]];
+            if(new_posts.length > 0){
+                if(is_object_empty(posts_data)){
+                    //
+                    // if the posts data is empty, initialize field arrays
+                    // with a first item of new_posts
+                    //
+                    var item = new_posts.shift();
+
+                    posts_data = {};
+                    for(var i in item){
+                        posts_data[i] = [item[i]];
+                    }
+                }
+
+                for(var p in new_posts){
+                    for(var i in posts_data){
+                        posts_data[i].push(new_posts[p][i]);
+                    }
                 }
             }
 
-            for(var p in new_posts){
-                for(var i in posts_data){
-                    posts_data[i].push(new_posts[p][i]);
-                }
+            // iterate
+            page_nums[0]++;
+            request_next_page();
+
+            function is_object_empty(o){
+                for(var i in o) return false;
+                return true;
             }
         }
 
-        // iterate
-        page_nums[0]++;
-        request_next_page();
+        function store_posts(){
+            function data_count(o){
+                for(var i in o) return o[i].length;
+            }
 
-        function is_object_empty(o){
-            for(var i in o) return false;
-            return true;
-        }
-    }
+            var count = data_count(posts_data);
 
-    function store_posts(){
-        function data_count(o){
-            for(var i in o) return o[i].length;
-        }
+            console.log('Parsed ' + count + ' posts: ', posts_data);
 
-        var count = data_count(posts_data);
+            if(count > 0){
+                localStorage[target_key] = LZW.compress(posts_data);
+            }
 
-        console.log('Parsed ' + count + ' posts: ', posts_data);
-
-        if(count > 0){
-            localStorage[target_key] = LZW.compress(posts_data);
+            process_url();
         }
     }
 }
