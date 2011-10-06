@@ -38,7 +38,7 @@ var m = (function () {
                         return {
                             href:       'http://www.intscholarships.com' + $("h2.title > a", this).attr('href'),
                             title:      $("h2.title > a", this).text(),
-                            text:       $("div.content > p", this).text()
+                            text:       $("div.content", this).text()
                         };
                     }).get();
                 },
