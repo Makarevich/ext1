@@ -4,8 +4,9 @@ chrome.extension.sendRequest('ready', function(o){
     console.assert(o.key != null);
     console.assert(o.data != null);
 
-    /* printing display hash */
-    $('body').append('<h1>' + o.key + ' ' + o.pat + ' (' + sha1(o.data)  + ')' + '</h1>')
+    /* printing display info */
+    $('body').append('<h1>' + o.key + ' ' + o.pat + '</h1>')
+    $('body').append('<p>' + sha1(o.data) + '</p>')
 
     // var pat = $('div#patterns > div').hasClass(o.key);
     var pat = $('div#patterns > div').filter(function(){
