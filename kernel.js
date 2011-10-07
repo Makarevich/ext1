@@ -98,23 +98,22 @@ function join_posts(keys, target_key){
         'No keys selected');
 
     // initialize the collection with the first data element
-    var coll = LZW.decompress( localStorage[ keys.shift() ] );
+    var coll = LZW.decompress( localStorage[ keys[0] ] );
 
     // make sure 'href' field is present in the data
     assert( coll.href, "Initial data does not have a 'href' field" );
 
-    // define a bit of counters
-    var count_uni = 0;
-    var count_total = 0;
+    // clear the collection
+    for(var i in coll){
+        coll[i] = [];
+    }
 
     // initialize the uniqueness map
     var uni = {};
-    for(var i in coll.href){
-        uni[ coll.href[i] ] = true;
 
-        ++count_uni;
-        ++count_total;
-    }
+    // define a bit of counters
+    var count_uni = 0;
+    var count_total = 0;
 
     // join the other data to the collection
     for(var i in keys){
@@ -144,6 +143,8 @@ function join_posts(keys, target_key){
             if(uni[ data.href[j] ]){
                 continue;
             }
+
+            uni[ data.href[j] ] = true;
 
             ++count_uni;
 
