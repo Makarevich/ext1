@@ -196,4 +196,10 @@ function glob(pat){
         }) + '$');
 }
 
+/* ==== fetch_url ==== */
+
+function fetch_url(url, cb){
+    console.log('Requesting ' + url + ' ...');
+    jQuery.get(url).done(cb);
+}
 

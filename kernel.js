@@ -212,11 +212,6 @@ function fetch_posts(urls){
         // start the process
         check_url(url);
 
-        function fetch_url(url, cb){
-            console.log('Requesting ' + url + ' ...');
-            jQuery.get(url).done(cb);
-        }
-
         function check_url(url){
             var patterns = api.get_url_patterns();
 
