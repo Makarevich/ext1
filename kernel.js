@@ -317,11 +317,12 @@ function fetch_posts(urls){
     }
 }
 
-function fetch_details(key, filter){
+function fetch_details(target, key, filter){
     var api = m.get_detail_api();
 
     // deal with the filter
 
+    // TODO: decouple the filter processing algorithm
     if(filter && typeof filter == 'string'){
         filter = filter.split(/ +/);
 
@@ -351,38 +352,85 @@ function fetch_details(key, filter){
         var hs = [];
 
         for (var k in filter){
-            assert(k >= 0 && k < href.length,
+            assert(k >= 0 && k < hrefs.length,
                 "Key '" + filter[k] + "' is out of bound of the href array" +
-                " (which is of length " + href.length + ")");
+                " (which is of length " + hrefs.length + ")");
             hs.push(hrefs[k]);
         }
 
-
+        return hs;
     })(href.href);
+
+    // initialize the data holder and start the process
+
+    var posts_data = {};
+
+    fetch_next_url();
+
+    /////
 
     function fetch_next_url(){
         var url = href.shift();
 
-        if(!url) return;
+        if(!url){
+            store_details();
+            return;
+        }
 
-        console.log("Fetching ", h);
-
+        fetch_url(url, parse_details);
     }
 
     function parse_details(html){
         docroot.innerHTML = html;
 
-        var new_posts = api.parse_posts(docroot);
+        var new_item = api.parse_details(docroot);
+
+        // console.log('new item:',new_item);
+
+        if(is_object_empty(posts_data)){
+            //
+            // if the posts data is empty, initialize field arrays
+            // with a first item of new_posts
+            //
+            posts_data = {};
+            for(var i in new_item){
+                posts_data[i] = [new_item[i]];
+            }
+        }else{
+            // kind of verify the new_item
+            for(var i in new_item){
+                assert(posts_data[i], 
+                    "Details parser returned an item '" + i + "', " +
+                    "which is not present in previously collected posts_data");
+            }
+
+            for(var i in posts_data){
+                assert(new_item[i], 
+                    "Returned details lack an item '" + i + "', " +
+                    "which is present in previously collected posts_data");
+
+                posts_data[i].push(new_item[i]);
+            }
+        }
+
+        // iterate
+        fetch_next_url();
+
+        function is_object_empty(o){
+            for(var i in o) return false;
+            return true;
+        }
     }
 
-    for (var k in filter){
-        assert(k >= 0 && k < href.length,
-            "Key '" + filter[k] + "' is out of bound of the href array" +
-            " (which is of length " + href.length + ")");
+    function store_details(){
+        var count = (function(data){
+            for(var i in data) return data[i].length;
+        })(posts_data);
+        
+        console.log("Fetched " + count + " details:", posts_data);
 
-        var h = href[k];
-
+        if(count > 0){
+            localStorage[target] = LZW.compress(posts_data);
+        }
     }
-
-
 }
