@@ -67,19 +67,13 @@ var m = (function () {
 
                     var entry = spost.children('div.entry.clearfix').eq(0);
 
-                    // fetch div paragraphs
+                    // fetch paragraphs
                     var data = entry
-                        .children('div').children('p')
+                        .children('div,p')
                         .map(function(i, dom){
-                            return $(this).html()
+                            var n = $(this);
+                            return /^\s*$/.test(n.text()) ? null : n.html();    // filter out empty paragraphs
                         }).get();
-
-                    // append ordinary paragraphs
-                    [].push.apply(data, entry
-                        .children('p')              // TODO: filter out empty paragraphs
-                        .map(function(i, dom){
-                            return $(this).html()
-                        }).get());
 
                     return {
                         title:          spost.children('h1').text(),
