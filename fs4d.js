@@ -60,7 +60,35 @@ var m = (function () {
         get_detail_api:     function () {
             return {
                 parse_details: function(docroot){
-                }
+                    var spost = $('div#content > div.maincontent > div.singlepost > div.post.clearfix', docroot);
+
+                    // console.log('docroot', docroot);
+                    // console.log('spost size', spost.size());
+
+                    var entry = spost.children('div.entry.clearfix').eq(0);
+
+                    // fetch div paragraphs
+                    var data = entry
+                        .children('div').children('p')
+                        .map(function(i, dom){
+                            return $(this).html()
+                        }).get();
+
+                    // append ordinary paragraphs
+                    [].push.apply(data, entry
+                        .children('p')              // TODO: filter out empty paragraphs
+                        .map(function(i, dom){
+                            return $(this).html()
+                        }).get());
+
+                    return {
+                        title:          spost.children('h1').text(),
+                        date:           spost.children('p.postinfo').text(),
+                        data:           data
+                    }
+                },
+
+                name:   's4d'
             };
         }
     }
