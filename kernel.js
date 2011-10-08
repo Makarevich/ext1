@@ -322,3 +322,45 @@ function fetch_posts(urls){
     }
 }
 
+function fetch_details(key, filter){
+    var api = m.get_detail_api();
+
+    // deal with the filter
+
+    if(filter && typeof filter == 'string'){
+        filter = filter.split(/ +/);
+
+        var fs = {};
+
+        for(var i in filter){
+            var f = filter[i];
+            if(f){
+                fs[ keycode.dekey(f) ] = f;
+            }
+        }
+
+        // console.log("Dekeyed:", fs);
+
+        filter = fs;
+    }else{
+        assert(0, 'Invalid filter passed');
+    }
+
+    // obtain the href array
+
+    var href = LZW.decompress( localStorage[key] );
+    assert(href.href, "The object of '" + key + "' has no href property")
+    href = href.href;
+
+    for (var k in filter){
+        assert(k >= 0 && k < href.length,
+            "Key '" + filter[k] + "' is out of bound of the href array" +
+            " (which is of length " + href.length + ")");
+
+        var h = href[k];
+
+        console.log("Fetching ", h);
+    }
+
+
+}

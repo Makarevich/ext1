@@ -55,6 +55,13 @@ var m = (function () {
                 name:   's4d'
             };
 
+        },
+        
+        get_detail_api:     function () {
+            return {
+                parse_details: function(docroot){
+                }
+            };
         }
     }
 
