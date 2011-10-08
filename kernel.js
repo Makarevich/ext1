@@ -350,7 +350,35 @@ function fetch_details(key, filter){
 
     var href = LZW.decompress( localStorage[key] );
     assert(href.href, "The object of '" + key + "' has no href property")
-    href = href.href;
+
+    href = (function (hrefs){
+        
+        var hs = [];
+
+        for (var k in filter){
+            assert(k >= 0 && k < href.length,
+                "Key '" + filter[k] + "' is out of bound of the href array" +
+                " (which is of length " + href.length + ")");
+            hs.push(hrefs[k]);
+        }
+
+
+    })(href.href);
+
+    function fetch_next_url(){
+        var url = href.shift();
+
+        if(!url) return;
+
+        console.log("Fetching ", h);
+
+    }
+
+    function parse_details(html){
+        docroot.innerHTML = html;
+
+        var new_posts = api.parse_posts(docroot);
+    }
 
     for (var k in filter){
         assert(k >= 0 && k < href.length,
@@ -359,7 +387,6 @@ function fetch_details(key, filter){
 
         var h = href[k];
 
-        console.log("Fetching ", h);
     }
 
 
