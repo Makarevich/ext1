@@ -377,13 +377,18 @@ function fetch_details(key, target, filter){
             return;
         }
 
-        fetch_url(url, parse_details);
+        fetch_url(url, function(html){
+            parse_details(url, html);
+        });
     }
 
-    function parse_details(html){
+    function parse_details(url, html){
         docroot.innerHTML = html;
 
         var new_item = api.parse_details(docroot);
+
+        // hack: add url item
+        new_item['url'] = url;
 
         // console.log('new item:',new_item);
 
