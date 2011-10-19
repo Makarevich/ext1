@@ -317,7 +317,7 @@ function fetch_posts(urls){
     }
 }
 
-function fetch_details(target, key, filter){
+function fetch_details(key, target, filter){
     var api = m.get_detail_api();
 
     // deal with the filter
