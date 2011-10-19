@@ -87,7 +87,29 @@ var m = (function () {
 
                 name:   'portal'
             };
+        },
+        
+        get_detail_api:     function () {
+            return {
+                parse_details: function(docroot){
+                    var hdr = $('div#DetailsHeader', docroot)
+                        .children('h1').siblings('h2').andSelf()
+                        .map(function() { return $(this).html() }).get();
 
+                    var prog = $('div#ProgrammeContainer', docroot).html();
+
+                    var tabs = $('div.TabContainer[data-id != "contact"] ', docroot)
+                        .map(function() { return $(this).html() }).get();
+                    
+                    return {
+                        hdr:        hdr,            // array of html
+                        data:       prog,           // html
+                        tabs:       tabs            // array of html
+                    }
+                },
+
+                name:   'portal'
+            };
         }
     }
 
