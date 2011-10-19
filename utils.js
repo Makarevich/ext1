@@ -132,7 +132,8 @@ var keycode = (function(){
 
     return {
         enkey: enkey,
-        dekey: dekey
+        dekey: dekey,
+        chars: chs
     };
 
     function enkey(n){
@@ -169,6 +170,10 @@ var keycode = (function(){
         }
 
         return n - 1;
+    }
+
+    function chs() {
+        return chars;
     }
 
 })();

@@ -7,6 +7,7 @@ chrome.extension.sendRequest('ready', function(o){
     /* printing display info */
     $('body').append('<h1>' + o.key + ' ' + o.pat + '</h1>')
     $('body').append('<p>' + sha1(o.data) + '</p>')
+    $('body').append('<p>' + keycode.chars() + '</p>')
 
     // var pat = $('div#patterns > div').hasClass(o.key);
     var pat = $('div#patterns > div').filter(function(){
