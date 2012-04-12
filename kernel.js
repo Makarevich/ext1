@@ -32,10 +32,9 @@ chrome.extension.onRequest.addListener(function(req, sender, respond){
 
 
 /* ==== console API ==== */
-function run(name, key){
-    if(key){
-        data_key1 = key;
-    }
+function run(name, key1, key2){
+    if(key1) data_key1 = key1;
+    if(key2) data_key2 = key2;
 
     jQuery.getScript(name.toString() + '.js');
 }
