@@ -1,5 +1,4 @@
 
-
 chrome.extension.sendRequest('ready', function(o){
     console.assert(o.key != null);
     console.assert(o.data != null);
